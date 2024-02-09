@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<form action="/upload" enctype="multipart/form-data" method="post">
+    {% csrf_token %}
+
+    <h1>Upload Your Article</h1>
+    <hr>
+    <p>
+        <label>Title of the article: <input name="title" type="text"></label>
+    </p>
+    <hr>
+    <p>
+        Determine whether to display this article to the public
+        <select name="visible">
+            <option value=1>Yes</option>
+            <option value=0>No</option>
+        </select>
+    </p>
+    <hr>
+    <p>
+     Select the theme:
+    <select name="theme">
+        {% for data in fesible_theme%}
+        <option value="{{data.theme_name}}">
+            <p>
+            {{data.theme_name}}: {{data.description}}
+            </p>
+        </option>
+        {% endfor %}
+    </select>
+    </p>
+
+    <p>Choose you article (Please sumbit .doc/.docx file !!!)
+        <input \ name="article" type="file">
+    </p>
+    <hr>
+
+
+
+
+    <input \ type="submit" value="submit !">
+
+</form>
+
+</body>
+</html>

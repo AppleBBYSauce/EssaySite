@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Corpus</title>
+</head>
+<body>
+
+{% if rank == 1 %}
+<h1>Article Directories: {{field}} </h1>
+<hr/>
+{% for data in articles %}
+<div>
+    <h3>{{data.title}}</h3>
+    <h5>Author: {{data.author}}</h5>
+    <h5>Publish Date: {{data.publish_time}}</h5>
+    {% if authorize == 1%}
+    {% if data.visible%}
+    <h6>Visible: True</h6>
+    {% else %}
+    <h6>Visible: False</h6>
+    {% endif %}
+    {% endif %}
+    <ul>
+        <li><a href="{% url 'download' %}?save_path={{data.save_path}}"> Download </a></li>
+        <li><a href="{% url 'view' %}?save_path={{data.save_path}}"> View </a></li>
+        {% if authorize == 1%}
+        <li><a href="{% url 'visible' %}?save_path={{data.save_path}}"> Change Visible Status </a></li>
+        <li><a href="{% url 'delete' %}?save_path={{data.save_path}}"> Delete Article</a></li>
+        {% endif %}
+    </ul>
+</div>
+<hr/>
+{% endfor %}
+{% else %}
+<h1>Theme Directories: {{field}} </h1>
+<hr/>
+{% for data in articles %}
+<ul>
+
+<li><a href="{% url 'index' %}?theme={{data.theme_name}}"> {{data.theme_name}} </a></li>
+<li>Description: {{data.description}}</li>
+<li>Start at: {{data.start_time}}</li>
+<li>End at: {{data.end_time}}</li>
+
+</ul>
+
+{% endfor %}
+{%endif%}
+<hr/>
+<p>
+    <a href="{% url 'logout'%}">Logout</a>
+</p>
+<p>
+    <a href="{% url 'manage'%}">Manage my article</a>
+</p>
+<p>
+    <a href="{% url 'upload'%}">Upload my article</a>
+</p>
+<p>
+    <a href="{% url 'theme'%}">Public Theme</a>
+</p>
+{% if authorize == 1%}
+<p>
+    <a href="{% url 'index'%}">Return Home</a>
+</p>
+{% endif %}
+
+
+</body>
+</html>
+

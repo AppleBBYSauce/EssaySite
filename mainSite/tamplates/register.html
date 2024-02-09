@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1> Register Page</h1>
+<hr>
+<form action="{% url 'register' %}" enctype="multipart/form-data" method="post">
+    {% csrf_token %}
+    <label>User Name: <input name="user_name" type="text"></label>
+    <label>Password: <input name="user_password" type="password"></label>
+    <input type="submit" value="register !">
+
+</form>
+
+</body>
+</html>
