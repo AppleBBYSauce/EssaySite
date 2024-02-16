@@ -62,11 +62,11 @@
     <a href="{% url 'upload'%}">Upload my article</a>
 </p>
 <p>
-    <a href="{% url 'theme'%}">Public Theme</a>
+    <a href="{% url 'index'%}">Return Home</a>
 </p>
 {% if authorize == 1%}
 <p>
-    <a href="{% url 'index'%}">Return Home</a>
+    <a href="{% url 'theme'%}">Public Theme</a>
 </p>
 {% endif %}
 

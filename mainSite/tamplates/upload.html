@@ -4,15 +4,17 @@
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
+
+
 <body>
 
-<form action="/upload" enctype="multipart/form-data" method="post">
+<form action="/upload" enctype="multipart/form-data" method="post" id="myForm">
     {% csrf_token %}
 
     <h1>Upload Your Article</h1>
     <hr>
     <p>
-        <label>Title of the article: <input name="title" type="text"></label>
+        <label>Title of the article: <input name="title" type="text" id="textInput"></label>
     </p>
     <hr>
     <p>
@@ -37,16 +39,58 @@
     </p>
 
     <p>Choose you article (Please sumbit .doc/.docx file !!!)
-        <input \ name="article" type="file">
+        <input \ name="article" type="file" id="fileInput">
     </p>
     <hr>
-
-
-
-
-    <input \ type="submit" value="submit !">
+    <button type="submit" value="submit !"> Submit! </button>
 
 </form>
 
 </body>
+
+<script>
+
+    // 获取表单元素
+    var form = document.getElementById("myForm");
+    var fileInput = document.getElementById("fileInput");
+    var textInput = document.getElementById("textInput");
+
+    // 定义允许的文件后缀名
+    var allowedExtensions = [".doc", ".docx"];
+
+    // 添加表单提交事件监听器
+    form.addEventListener("submit", function(event) {
+      // 阻止默认提交行为
+      event.preventDefault();
+
+      // 获取文件名和文本框内容
+      var fileName = fileInput.value;
+      var text = textInput.value;
+
+      // 检查文件是否上传
+      if (fileName == "") {
+        alert("请上传一个文件");
+        return false;
+      }
+
+      // 检查文件后缀名是否合法
+<!--      var fileExtension = fileName.split(".").pop().toLowerCase(); // 获取文件后缀名-->
+<!--      console.log("AAAA")-->
+<!--      if (!allowedExtensions.includes(fileExtension)) {-->
+<!--        alert("只允许上传.doc或.docx格式的文件");-->
+<!--        return false;-->
+<!--      }-->
+
+      // 检查文本框是否为空
+      if (text == "") {
+        alert("请填写文本框");
+        return false;
+      }
+
+      // 如果通过了所有验证，提交表单
+      form.submit();
+    });
+
+</script>
+
 </html>

@@ -34,19 +34,25 @@ def read_html(path):
 
 
 def mainSite(requestion: HttpRequest):
-    user_name = requestion.COOKIES.get("user_name")
+    if requestion.COOKIES.get("verify_code", "*") != requestion.session.get("verify_code", "**"):
+        return render(request=requestion, template_name="login.html")
+    user_name = eval(requestion.COOKIES.get("user_name")).decode("utf-8")
+    if user_name == "ZZH_admin":
+        authorize = 1
+    else:
+        authorize = 0
     if theme := requestion.GET.get("theme"):
         rank = 1
         articles = Corpus.objects.filter(visible=True, theme_name=theme)
     else:
         rank = 0
         articles = Theme.objects.all()
-    if requestion.COOKIES.get(user_name, "*") != requestion.session.get(user_name, "**"):
+    if requestion.COOKIES.get("verify_code", "*") != requestion.session.get("verify_code", "**"):
         return render(request=requestion, template_name="login.html")
     return render(request=requestion, template_name="MainSite.html",
                   context={"articles": articles,
                            "field": "For All",
-                           "authorize": 0,
+                           "authorize": authorize,
                            "rank": rank})
 
 def createTheme(requestion: HttpRequest):
@@ -93,8 +99,8 @@ def returnFile(requestion: HttpRequest):
 
 
 def manage(requestion: HttpRequest):
-    user_name = requestion.COOKIES.get("user_name")
-    if requestion.COOKIES.get(user_name, "*") != requestion.session.get(user_name, "**"):
+    user_name = eval(requestion.COOKIES.get("user_name")).decode("utf-8")
+    if requestion.COOKIES.get("verify_code", "*") != requestion.session.get("verify_code", "**"):
         return render(request=requestion, template_name="login.html")
     articles = Corpus.objects.filter(author=user_name)
     return render(request=requestion, template_name="Manage.html",
@@ -114,9 +120,9 @@ def user_login(requestion: HttpRequest):
             redir = reverse("index")
             response = redirect(redir)
             verify_code = str(random.random())
-            response.set_cookie(key=user_name, value=verify_code)
-            response.set_cookie(key="user_name", value=user_name)
-            requestion.session[user_name] = verify_code
+            response.set_cookie(key="verify_code", value=verify_code)
+            response.set_cookie(key="user_name", value=str(user_name.encode("utf-8")))
+            requestion.session["verify_code"] = verify_code
             return response
     elif requestion.method == "GET":
         return render(request=requestion, template_name="login.html")
@@ -133,7 +139,6 @@ def user_register(requestion: HttpRequest):
         user_name = requestion.POST.get("user_name")
         if User.objects.filter(user_name=user_name):
             return HttpResponse("Author Exist!")
-
         user_password: str = requestion.POST.get("user_password")
         new_user = User(user_name=user_name, user_password_hash=hashlib.sha256(user_password.encode()).hexdigest())
         new_user.save()
@@ -144,12 +149,11 @@ def user_register(requestion: HttpRequest):
 
 def upload(requestion: HttpRequest):
     if requestion.method == "POST":
-        user_name = requestion.COOKIES.get("user_name")
-        if requestion.COOKIES.get(user_name, "*") != requestion.session.get(user_name, "**"):
+        user_name = eval(requestion.COOKIES.get("user_name")).decode("utf-8")
+        if requestion.COOKIES.get("verify_code", "*") != requestion.session.get("verify_code", "**"):
             return render(request=requestion, template_name="login.html")
         else:
             theme = requestion.POST.get("theme")
-            print(theme)
             visible = bool(requestion.POST.get("visible", True))
             title = requestion.POST.get("title")
             path = os.path.join(settings.MEDIA_ROOT, user_name)
@@ -163,7 +167,6 @@ def upload(requestion: HttpRequest):
                                 publish_time=timezone.now(),
                                 last_update_time=timezone.now(),
                                 theme_name=theme)
-            new_corpus.save()
             suffix = os.path.basename(save_path).split(".")[-1]
             if (not (files := requestion.FILES.get("article", None))) or (suffix not in {"doc", "docx"}):
                 return HttpResponse("Please upload a valid file !!!!!")
@@ -171,12 +174,14 @@ def upload(requestion: HttpRequest):
                 for chunk in files.chunks():
                     f.write(chunk)
             doc2Html(path=save_path)
+            new_corpus.save()
             redir = reverse("index")
             return redirect(redir)
     else:
-        now = timezone.now()
-        fesible_theme = Theme.objects.filter(start_time__lt=now, end_time__gt=now)
-        return render(request=requestion, template_name="upload.html", context={"fesible_theme":fesible_theme})
+        # now = timezone.now()
+        # fesible_theme = Theme.objects.filter(start_time__lt=now, end_time__gt=now)
+        fesible_theme = Theme.objects.all()
+        return render(request=requestion, template_name="upload.html", context={"fesible_theme": fesible_theme})
 
 
 def view_content(requestion: HttpRequest):
